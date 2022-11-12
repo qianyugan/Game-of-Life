@@ -1,10 +1,12 @@
 /*
 代码由 qianyugan 原创，转载请注明出处
 */
+
 #include <iostream>
 #include <windows.h>
 #include <cstring>
 #include <string.h>
+#include <ctime>
 
 using namespace std;
 
@@ -70,6 +72,8 @@ void showSurface(){
 // 随机生成生命状态图，p 为初始存活概率
 void randomSeed(int p){
     clearSurface();
+    // 设置随机数种子
+    srand((unsigned int)time(NULL));
     for(int i = 0; i < h; i++){
         for(int j = 0; j < w; j++){
             if((rand() % 100) <= p){
@@ -144,6 +148,7 @@ int main() {
     cout << "输入初始存活概率（0~100，建议不要过高）：___\b\b\b";
     cin >> p;
     system("cls");
+    system("color f0");
     clearSurface();  // 清空生命状态图
     randomSeed(p);    // 随机产生生命状态图
     showSurface();   // 输出初始生命状态图
