@@ -1,3 +1,6 @@
+/*
+代码由 qianyugan 原创，转载请注明出处
+*/
 #include <iostream>
 #include <windows.h>
 #include <cstring>
@@ -77,100 +80,23 @@ void randomSeed(int p){
     }
 }
 
-// 判断生命位置是否临界以及临界位置，不在生命状态图边界返回-1，否则返回从生命状态图左上顺时针旋转对应 0~7
-int pdPos(int x, int y){
-    if(x == 0){
-        if(y == 0) return 0;
-        else if(y == (w - 1)) return 2;
-        else return 1;
-    }else if(x == (h - 1)){
-        if(y == (w - 1)) return 4;
-        else if(y == 0) return 6;
-        else return 5;
-    }else if(y == 0) return 7;
-    else if(y == (w - 1)) return 3;
-    else return -1;
-}
-
-// code 状态码即 pdPos() 得到的生命位置
-int pdAround(int x, int y, int code){
-    if(code == -1){
-        return (
-                (surface[x - 1][y - 1] == 1)
-              + (surface[x - 1][y] == 1)
-              + (surface[x - 1][y + 1] == 1)
-              + (surface[x][y + 1] == 1)
-              + (surface[x + 1][y + 1] == 1)
-              + (surface[x + 1][y] == 1)
-              + (surface[x + 1][y - 1] == 1)
-              + (surface[x][y - 1] == 1)
+// 判断 (x, y) 附近的生命数量
+int pdAround(int x, int y){
+    int x_sub = (x + h - 1) % h;
+    int y_sub = (y + w - 1) % w;
+    int x_plus = (x + 1) % h;
+    int y_plus = (y + 1) % w;
+    int lifes = (
+                (surface[x_sub][y_sub] == 1)
+              + (surface[x_sub][y] == 1)
+              + (surface[x_sub][y_plus] == 1)
+              + (surface[x][y_plus] == 1)
+              + (surface[x_plus][y_plus] == 1)
+              + (surface[x_plus][y] == 1)
+              + (surface[x_plus][y_sub] == 1)
+              + (surface[x][y_sub] == 1)
                 );
-    }
-    if(code == 0){
-        return (
-                (surface[x][y + 1] == 1)
-              + (surface[x + 1][y + 1] == 1)
-              + (surface[x + 1][y] == 1)
-                );
-    }
-    if(code == 1){
-        return (
-                (surface[x][y + 1] == 1)
-              + (surface[x + 1][y + 1] == 1)
-              + (surface[x + 1][y] == 1)
-              + (surface[x + 1][y - 1] == 1)
-              + (surface[x][y - 1] == 1)
-                );
-    }
-    if(code == 2){
-        return (
-                (surface[x + 1][y] == 1)
-              + (surface[x + 1][y - 1] == 1)
-              + (surface[x][y - 1] == 1)
-                );
-    }
-    if(code == 3){
-        return (
-                (surface[x - 1][y - 1] == 1)
-              + (surface[x - 1][y] == 1)
-              + (surface[x + 1][y] == 1)
-              + (surface[x + 1][y - 1] == 1)
-              + (surface[x][y - 1] == 1)
-                );
-    }
-    if(code == 4){
-        return (
-                (surface[x - 1][y - 1] == 1)
-              + (surface[x - 1][y] == 1)
-              + (surface[x][y - 1] == 1)
-                );
-    }
-    if(code == 5){
-        return (
-                (surface[x - 1][y - 1] == 1)
-              + (surface[x - 1][y] == 1)
-              + (surface[x - 1][y + 1] == 1)
-              + (surface[x][y + 1] == 1)
-              + (surface[x][y - 1] == 1)
-                );
-    }
-    if(code == 6){
-        return (
-                (surface[x - 1][y] == 1)
-              + (surface[x - 1][y + 1] == 1)
-              + (surface[x][y + 1] == 1)
-                );
-    }
-    if(code == 7){
-        return (
-                (surface[x - 1][y] == 1)
-              + (surface[x - 1][y + 1] == 1)
-              + (surface[x][y + 1] == 1)
-              + (surface[x + 1][y + 1] == 1)
-              + (surface[x + 1][y] == 1)
-                );
-    }
-    return -999;
+    return lifes;
 }
 
 // 设置位于 (x, y) 处生命的状态
@@ -178,13 +104,13 @@ void setState(int x, int y){
     // 如果无生命
     if(surface[x][y] == 0){
         // 当周围生命数量为 3 时产生新生命（模拟繁殖）
-        if(pdAround(x, y, pdPos(x, y)) == 3){
+        if(pdAround(x, y) == 3){
             new_surface[x][y] = 1;
             return;
         }
     }else{
         // 如果已存在生命，当周围生命数量低于 2 或大于 3 死亡，分别模拟生命数量稀少和生命数量过多
-        if((pdAround(x, y, pdPos(x, y)) < 2) || (pdAround(x, y, pdPos(x, y)) > 3)){
+        if((pdAround(x, y) < 2) || (pdAround(x, y) > 3)){
             new_surface[x][y] = 0;
             return;
         }
